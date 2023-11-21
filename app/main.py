@@ -14,7 +14,7 @@ from wtforms.validators import InputRequired, Length, Email, EqualTo, Validation
 
 sess = tf.compat.v1.Session()
 set_session(sess)
-model = keras.models.load_model("/app/model/poet_gru_model")
+model = keras.models.load_model("/app/model/poet_gru_model.h5",compile=False)
 word_model = Word2Vec.load("/app/model/word2vec_model")
 word_vec = word_model.wv
 
@@ -58,7 +58,10 @@ def generatePoem(scheme, starting):
     possible = []
     first_end_word = starting.split()[-1]
     rhyming_words = pronouncing.rhymes(first_end_word)
-    most_sim = list(word_model.most_similar(first_end_word))
+    try:
+    	most_sim = list(word_model.most_similar(first_end_word))
+    except:
+    	return "Word not found in vocabulary"
     for word, prob in most_sim:
         if word in rhyming_words:
             possible.append(word)
